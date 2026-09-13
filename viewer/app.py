@@ -199,6 +199,27 @@ def archive_label(value):
     return f"{label} · #{suffix.lower()}"
 
 
+def format_lto_generation(value):
+    if value is None:
+        return "—"
+
+    text = str(value).strip()
+
+    if not text:
+        return "—"
+
+    match = re.match(
+        r"^(?:LTO[- ]*)?(\d+)$",
+        text,
+        re.IGNORECASE,
+    )
+
+    if match:
+        return f"LTO {match.group(1)}"
+
+    return text
+
+
 def format_bytes(value):
     if value is None:
         return "-"
@@ -235,6 +256,10 @@ app.jinja_env.filters[
 app.jinja_env.filters[
     "format_bytes"
 ] = format_bytes
+
+app.jinja_env.filters[
+    "format_lto_generation"
+] = format_lto_generation
 
 app.jinja_env.filters[
     "archive_label"

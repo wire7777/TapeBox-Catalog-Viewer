@@ -79,7 +79,7 @@
                 Generation
             </span>
             <strong>
-                {{ tape.generation or "—" }}
+                {{ tape.generation|format_lto_generation }}
             </strong>
         </div>
 
