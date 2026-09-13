@@ -13,7 +13,7 @@ services:
       - "8081:8081"
 
     environment:
-      TAPEBOX_CATALOG_URL: "http://192.168.2.160:8080/api/catalog-mirror/download"
+      TAPEBOX_CATALOG_URL: "${TAPEBOX_CATALOG_URL:-http://tapebox:8080/api/catalog-mirror/download}"
 
     volumes:
       - ./data:/app/data
@@ -37,7 +37,7 @@ services:
       - viewer.auto_sync
 
     environment:
-      TAPEBOX_CATALOG_URL: "http://192.168.2.160:8080/api/catalog-mirror/download"
+      TAPEBOX_CATALOG_URL: "${TAPEBOX_CATALOG_URL:-http://tapebox:8080/api/catalog-mirror/download}"
       TAPEBOX_SYNC_INTERVAL_SECONDS: "300"
 
     volumes:

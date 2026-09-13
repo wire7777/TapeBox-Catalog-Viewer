@@ -11,7 +11,7 @@ API_KEY_PATH = DATA_DIR / "mirror-api-key"
 
 DEFAULT_CATALOG_URL = os.environ.get(
     "TAPEBOX_CATALOG_URL",
-    "http://192.168.2.160:8080/api/catalog-mirror/download",
+    "http://tapebox:8080/api/catalog-mirror/download",
 )
 
 
@@ -26,7 +26,7 @@ def _defaults():
             if parsed.scheme in ("http", "https")
             else "http"
         ),
-        "host": parsed.hostname or "192.168.2.160",
+        "host": parsed.hostname or "tapebox",
         "port": parsed.port or 8080,
     }
 

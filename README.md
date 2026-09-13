@@ -167,7 +167,7 @@ Example:
 
 ```text
 Protocol: http
-Host:     192.168.2.160
+Host:     TAPEBOX-SERVER-IP
 Port:     8080
 ```
 
