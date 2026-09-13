@@ -384,3 +384,129 @@ th {
     background: currentColor;
     opacity: 0.75;
 }
+
+
+/* Files folder browser */
+
+.folder-location {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.file-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.file-type-badge {
+    display: inline-block;
+    min-width: 30px;
+    padding: 1px 4px;
+    border: 1px solid;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: center;
+    vertical-align: middle;
+}
+
+
+/* TapeBox Files table styling */
+
+.single-tape-badge,
+.tape-badge,
+.folder-badge,
+.spanned-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 1px;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.single-tape-badge {
+    color: #53e68b;
+    border: 1px solid #2dbf68;
+}
+
+.tape-badge {
+    color: #69aaff;
+    border: 1px solid #347fd1;
+}
+
+.folder-badge {
+    color: #aeb6c5;
+    border: 1px solid #596270;
+}
+
+.spanned-badge {
+    color: #f0b55d;
+    border: 1px solid #b87a2f;
+}
+
+.file-link {
+    color: #67a9ff;
+    font-weight: 600;
+}
+
+.file-link:hover {
+    color: #8fc0ff;
+    text-decoration: underline;
+}
+
+.folder-location {
+    padding: 12px 0 18px;
+    border-bottom: 1px solid #2c303a;
+}
+
+.folder-location .button-link {
+    border-radius: 1px;
+    background: transparent;
+    color: #69aaff;
+    border: 1px solid #347fd1;
+}
+
+.folder-location .button-link:first-of-type {
+    color: #53e68b;
+    border-color: #2dbf68;
+}
+
+.folder-location .button-link:hover {
+    background: rgba(70, 125, 190, 0.10);
+}
+
+.search-form button,
+.search-form .button-link {
+    border-radius: 1px;
+}
+
+table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+th {
+    color: #b9c7dc;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.part-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.file-type-badge {
+    border-radius: 1px;
+}

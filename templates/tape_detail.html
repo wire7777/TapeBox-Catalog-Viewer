@@ -176,8 +176,40 @@
         <h2>Files on This Tape</h2>
 
         <div class="muted">
-            {{ files|length }} files
+            {{ folder_count }}
+            folder{% if folder_count != 1 %}s{% endif %}
+            ·
+            {{ file_count }}
+            file{% if file_count != 1 %}s{% endif %}
         </div>
+
+    </div>
+
+    <div class="folder-location">
+
+        <strong>Location:</strong>
+
+        <a
+            class="button-link"
+            href="/tapes/{{ tape.id }}"
+        >
+            /
+        </a>
+
+        {% if current_path %}
+
+            <span class="muted">
+                / {{ current_path }}
+            </span>
+
+            <a
+                class="button-link"
+                href="/tapes/{{ tape.id }}{% if parent_path %}?path={{ parent_path|urlencode }}{% endif %}"
+            >
+                ↑ Parent Folder
+            </a>
+
+        {% endif %}
 
     </div>
 
@@ -187,33 +219,81 @@
 
             <thead>
                 <tr>
-                    <th>File</th>
+                    <th>Name</th>
                     <th>Path</th>
                     <th>Size</th>
+                    <th>Storage</th>
                     <th>Archived</th>
                 </tr>
             </thead>
 
             <tbody>
 
-            {% for file in files %}
+            {% for item in rows %}
+
+                {% if item.type == "directory" %}
 
                 <tr>
 
                     <td>
+                        <strong class="file-name">
+                            📁
 
-                        <strong>
-                            {{ file.filename }}
+                            <a
+                                href="/tapes/{{ tape.id }}?path={{ item.path|urlencode }}"
+                                class="file-link"
+                            >
+                                {{ item.name|archive_label }}
+                            </a>
+                        </strong>
+
+                        <div class="muted">
+                            {{ item.file_count }}
+                            file{% if item.file_count != 1 %}s{% endif %}
+                        </div>
+                    </td>
+
+                    <td class="path-cell">
+                        {{ item.path }}/
+                    </td>
+
+                    <td>
+                        {{ item.size_bytes|format_bytes }}
+                    </td>
+
+                    <td class="muted">
+                        —
+                    </td>
+
+                    <td class="muted">
+                        —
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                {% set file = item.file %}
+
+                <tr>
+
+                    <td>
+                        <strong class="file-name">
+                            {{ file.filename|file_icon }}
+
+                            <a
+                                href="/files/{{ file.id }}"
+                                class="file-link"
+                            >
+                                {{ file.filename }}
+                            </a>
                         </strong>
 
                         {% if file.is_spanned %}
-
-                            <div class="badge">
-                                Spanned
-                            </div>
-
+                        <div class="spanned-badge">
+                            SPANNED
+                        </div>
                         {% endif %}
-
                     </td>
 
                     <td class="path-cell">
@@ -221,10 +301,19 @@
                     </td>
 
                     <td>
-                        {{ "{:,}".format(
-                            file.size_bytes or 0
-                        ) }}
-                        bytes
+                        {{ file.size_bytes|format_bytes }}
+                    </td>
+
+                    <td>
+                        {% if file.is_spanned %}
+                            <span class="spanned-badge">
+                                SPANNED
+                            </span>
+                        {% else %}
+                            <span class="single-tape-badge">
+                                SINGLE TAPE
+                            </span>
+                        {% endif %}
                     </td>
 
                     <td>
@@ -233,14 +322,16 @@
 
                 </tr>
 
+                {% endif %}
+
             {% else %}
 
                 <tr>
                     <td
-                        colspan="4"
+                        colspan="5"
                         class="empty-cell"
                     >
-                        No files found for this tape.
+                        No files or folders found here.
                     </td>
                 </tr>
 

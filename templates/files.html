@@ -10,7 +10,8 @@ Files · TapeBox Catalog Viewer
     <div>
         <h1>Files</h1>
         <p>
-            Search the mirrored TapeBox archive catalog
+            Browse and search the mirrored
+            TapeBox archive catalog
         </p>
     </div>
 </div>
@@ -26,7 +27,7 @@ Files · TapeBox Catalog Viewer
             type="search"
             name="q"
             value="{{ query }}"
-            placeholder="Search filename, path, or tape path"
+            placeholder="Search filename or path..."
         >
 
         <button type="submit">
@@ -34,12 +35,12 @@ Files · TapeBox Catalog Viewer
         </button>
 
         {% if query %}
-            <a
-                class="button-link"
-                href="/files"
-            >
-                Clear
-            </a>
+        <a
+            class="button-link"
+            href="/files"
+        >
+            Clear
+        </a>
         {% endif %}
     </form>
 
@@ -58,27 +59,67 @@ Files · TapeBox Catalog Viewer
 <section class="card">
 
     <div class="table-header">
-        <h2>
-            {% if query %}
-                Search Results
-            {% else %}
-                Catalog Files
-            {% endif %}
-        </h2>
+        <div>
+            <h2>
+                {% if query %}
+                    Search Results
+                {% else %}
+                    Archive Catalog
+                {% endif %}
+            </h2>
 
-        <div class="muted">
-            {{ files|length }} files
+            <div class="muted">
+                {% if query %}
+                    {{ rows|length }}
+                    file{% if rows|length != 1 %}s{% endif %}
+                {% else %}
+                    {{ folder_count }}
+                    folder{% if folder_count != 1 %}s{% endif %}
+                    ·
+                    {{ file_count }}
+                    file{% if file_count != 1 %}s{% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
+
+    {% if not query %}
+
+    <div class="folder-location">
+        <strong>Location:</strong>
+
+        <a
+            href="/files"
+            class="button-link"
+        >
+            /
+        </a>
+
+        {% if current_path %}
+        <span class="path-cell">
+            /{{ current_path }}
+        </span>
+
+        <a
+            href="/files?path={{ parent_path|urlencode }}"
+            class="button-link"
+        >
+            ↑ Parent Folder
+        </a>
+        {% endif %}
+    </div>
+
+    {% endif %}
 
     <div class="table-wrap">
 
         <table>
             <thead>
                 <tr>
-                    <th>File</th>
+                    <th>Name</th>
                     <th>Path</th>
                     <th>Size</th>
+                    <th>Storage</th>
                     <th>Tape</th>
                     <th>Archived</th>
                 </tr>
@@ -86,11 +127,59 @@ Files · TapeBox Catalog Viewer
 
             <tbody>
 
-            {% for file in files %}
+            {% for item in rows %}
+
+                {% if item.type == "directory" %}
 
                 <tr>
                     <td>
-                        <strong>
+                        <strong class="file-name">
+                            📁
+                            <a
+                                href="/files?path={{ item.path|urlencode }}"
+                                class="file-link"
+                            >
+                                {{ item.name|archive_label }}
+                            </a>
+                        </strong>
+
+                        <div class="muted">
+                            {{ item.file_count }}
+                            file{% if item.file_count != 1 %}s{% endif %}
+                            recursively
+                        </div>
+                    </td>
+
+                    <td class="path-cell">
+                        {{ item.path }}/
+                    </td>
+
+                    <td>
+                        {{ item.size_bytes|format_bytes }}
+                    </td>
+
+                    <td class="muted">
+                        —
+                    </td>
+
+                    <td class="muted">
+                        —
+                    </td>
+
+                    <td class="muted">
+                        —
+                    </td>
+                </tr>
+
+                {% else %}
+
+                {% set file = item.file %}
+
+                <tr>
+                    <td>
+                        <strong class="file-name">
+                            {{ file.filename|file_icon }}
+
                             <a
                                 href="/files/{{ file.id }}"
                                 class="file-link"
@@ -100,9 +189,9 @@ Files · TapeBox Catalog Viewer
                         </strong>
 
                         {% if file.is_spanned %}
-                            <div class="badge">
-                                Spanned
-                            </div>
+                        <div class="spanned-badge">
+                            SPANNED
+                        </div>
                         {% endif %}
                     </td>
 
@@ -111,39 +200,45 @@ Files · TapeBox Catalog Viewer
                     </td>
 
                     <td>
-                        {{ "{:,}".format(file.size_bytes or 0) }}
-                        bytes
+                        {{ file.size_bytes|format_bytes }}
+                    </td>
+
+                    <td>
+                        {% if file.is_spanned %}
+                            <span class="spanned-badge">
+                                SPANNED
+                            </span>
+                        {% else %}
+                            <span class="single-tape-badge">
+                                SINGLE TAPE
+                            </span>
+                        {% endif %}
                     </td>
 
                     <td>
                         {% if file.is_spanned %}
 
-                            {% set parts =
-                                parts_by_file.get(
-                                    file.id,
-                                    []
-                                )
-                            %}
-
-                            {% for part in parts %}
-                                <div class="part-row">
-                                    Part
-                                    {{ part.part_number }}:
-                                    <strong>
-                                        {{ part.tape_label or "Unknown" }}
-                                    </strong>
-                                </div>
+                            {% for part in item.parts %}
+                            <div class="part-row">
+                                Part
+                                {{ part.part_number }}:
+                                <span class="tape-badge">
+                                    {{ part.tape_label or "Unknown" }}
+                                </span>
+                            </div>
                             {% endfor %}
 
-                            {% if not parts %}
-                                <span class="muted">
-                                    Spanned parts unavailable
-                                </span>
+                            {% if not item.parts %}
+                            <span class="muted">
+                                Parts unavailable
+                            </span>
                             {% endif %}
 
                         {% else %}
 
-                            {{ file.tape_label or "Unknown" }}
+                            <span class="tape-badge">
+                                {{ file.tape_label or "Unknown" }}
+                            </span>
 
                         {% endif %}
                     </td>
@@ -153,14 +248,20 @@ Files · TapeBox Catalog Viewer
                     </td>
                 </tr>
 
+                {% endif %}
+
             {% else %}
 
                 <tr>
                     <td
-                        colspan="5"
+                        colspan="6"
                         class="empty-cell"
                     >
-                        No files found.
+                        {% if query %}
+                            No files matched "{{ query }}".
+                        {% else %}
+                            No files in this folder.
+                        {% endif %}
                     </td>
                 </tr>
 
