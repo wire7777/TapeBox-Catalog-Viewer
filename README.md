@@ -70,21 +70,32 @@ cd /opt/tapebox-catalog-viewer
 
 ## Docker User Permissions
 
+The containers use configurable `PUID` and `PGID` values so they can run as a normal Linux user without hard-coded host IDs.
+
 Check your UID and GID:
 
 ```bash
 id
 ```
 
-The `user:` setting in `compose.yaml` should match the UID and GID that will own the `data` directory.
+Create a local environment file using your current UID and GID:
+
+```bash
+printf 'PUID=%s\nPGID=%s\n' "$(id -u)" "$(id -g)" > .env
+```
+
+Check it:
+
+```bash
+cat .env
+```
 
 Example:
 
-```yaml
-user: "1000:126"
+```text
+PUID=1000
+PGID=126
 ```
-
-This setting is used by both `catalog-viewer` and `catalog-sync`.
 
 Create the persistent data directory:
 
@@ -92,13 +103,15 @@ Create the persistent data directory:
 mkdir -p data
 ```
 
-Set the ownership to the same UID and GID used in `compose.yaml`.
+Set ownership to the same UID and GID configured in `.env`.
 
 Example:
 
 ```bash
 sudo chown -R 1000:126 data
 ```
+
+The real `.env` file is ignored by Git. Only `.env.example` is tracked.
 
 ## Build and Start
 
