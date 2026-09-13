@@ -171,6 +171,18 @@ Host:     TAPEBOX-SERVER-IP
 Port:     8080
 ```
 
+Before configuring the Viewer, open **Settings** on the main TapeBox server.
+
+Under **Catalog Mirror API Key**, click **Generate Random API Key**. TapeBox generates a cryptographically random 256-bit key displayed as 64 hexadecimal characters.
+
+Copy the generated key, then click **Save Settings** on the TapeBox server to activate it. Paste the same key into the **API Key** field on the Catalog Viewer Settings page.
+
+After saving on TapeBox, the key intentionally disappears from the web interface. An administrator can retrieve the current key later from the TapeBox server with:
+
+```bash
+sudo cat /var/lib/tapebox/catalog-mirror-api-key
+```
+
 The API key must match the catalog mirror API key configured on the TapeBox server.
 
 The viewer stores the API key separately at:
