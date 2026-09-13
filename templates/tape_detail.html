@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ tape.label if tape else "Tape" }} · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>
+            {% if tape %}
+                {{ tape.label }}
+            {% else %}
+                Tape
+            {% endif %}
+        </h1>
+
+        <p>
+            Read-only cartridge details
+        </p>
+    </div>
+
+    <div>
+        <a
+            class="button-link"
+            href="/tapes"
+        >
+            Back to Tapes
+        </a>
+    </div>
+</div>
+
+{% if error %}
+
+<section class="card">
+    <div class="status warning">
+        {{ error }}
+    </div>
+</section>
+
+{% elif tape %}
+
+<section class="card">
+
+    <h2>Tape Details</h2>
+
+    <div class="detail-grid">
+
+        <div>
+            <span class="detail-label">
+                Label
+            </span>
+            <strong>
+                {{ tape.label or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Friendly Name
+            </span>
+            <strong>
+                {{ tape.friendly_name or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Barcode
+            </span>
+            <strong>
+                {{ tape.barcode or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Generation
+            </span>
+            <strong>
+                {{ tape.generation or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                LTFS UUID
+            </span>
+            <strong class="mono">
+                {{ tape.ltfs_uuid or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Status
+            </span>
+            <strong>
+                {{ tape.status or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Used
+            </span>
+            <strong>
+                {% if tape.used_bytes is not none %}
+                    {{ "{:,}".format(
+                        tape.used_bytes
+                    ) }}
+                    bytes
+                {% else %}
+                    —
+                {% endif %}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Capacity
+            </span>
+            <strong>
+                {% if tape.capacity_bytes is not none %}
+                    {{ "{:,}".format(
+                        tape.capacity_bytes
+                    ) }}
+                    bytes
+                {% else %}
+                    —
+                {% endif %}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Location
+            </span>
+            <strong>
+                {{ tape.location or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Last Seen
+            </span>
+            <strong>
+                {{ tape.last_seen_at or "—" }}
+            </strong>
+        </div>
+
+    </div>
+
+    {% if tape.notes %}
+
+        <div class="notes-block">
+            <span class="detail-label">
+                Notes
+            </span>
+
+            <div>
+                {{ tape.notes }}
+            </div>
+        </div>
+
+    {% endif %}
+
+</section>
+
+<section class="card">
+
+    <div class="table-header">
+
+        <h2>Files on This Tape</h2>
+
+        <div class="muted">
+            {{ files|length }} files
+        </div>
+
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Path</th>
+                    <th>Size</th>
+                    <th>Archived</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for file in files %}
+
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            {{ file.filename }}
+                        </strong>
+
+                        {% if file.is_spanned %}
+
+                            <div class="badge">
+                                Spanned
+                            </div>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td class="path-cell">
+                        {{ file.relative_path }}
+                    </td>
+
+                    <td>
+                        {{ "{:,}".format(
+                            file.size_bytes or 0
+                        ) }}
+                        bytes
+                    </td>
+
+                    <td>
+                        {{ file.archived_at or "—" }}
+                    </td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td
+                        colspan="4"
+                        class="empty-cell"
+                    >
+                        No files found for this tape.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

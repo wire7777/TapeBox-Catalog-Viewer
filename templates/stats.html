@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}
+Stats · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Catalog Stats</h1>
+        <p>
+            Read-only overview of the mirrored TapeBox catalog
+        </p>
+    </div>
+</div>
+
+{% if error %}
+
+<section class="card">
+    <div class="status warning">
+        {{ error }}
+    </div>
+</section>
+
+{% elif stats %}
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Tapes
+        </div>
+
+        <div class="stat-value">
+            {{ "{:,}".format(
+                stats.tape_count
+            ) }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Files
+        </div>
+
+        <div class="stat-value">
+            {{ "{:,}".format(
+                stats.file_count
+            ) }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Spanned Files
+        </div>
+
+        <div class="stat-value">
+            {{ "{:,}".format(
+                stats.spanned_file_count
+            ) }}
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-label">
+            Utilization
+        </div>
+
+        <div class="stat-value">
+            {{ "%.2f"|format(
+                stats.utilization_percent
+            ) }}%
+        </div>
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <h2>Storage</h2>
+
+    <div class="detail-grid">
+
+        <div>
+            <span class="detail-label">
+                Logical File Data
+            </span>
+
+            <strong>
+                {{ "%.2f"|format(
+                    stats.logical_bytes
+                    / 1000000000000
+                ) }}
+                TB
+            </strong>
+
+            <div class="muted">
+                {{ "{:,}".format(
+                    stats.logical_bytes
+                ) }}
+                bytes
+            </div>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Tape Used
+            </span>
+
+            <strong>
+                {{ "%.2f"|format(
+                    stats.tape_used_bytes
+                    / 1000000000000
+                ) }}
+                TB
+            </strong>
+
+            <div class="muted">
+                {{ "{:,}".format(
+                    stats.tape_used_bytes
+                ) }}
+                bytes
+            </div>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Tape Capacity
+            </span>
+
+            <strong>
+                {{ "%.2f"|format(
+                    stats.tape_capacity_bytes
+                    / 1000000000000
+                ) }}
+                TB
+            </strong>
+
+            <div class="muted">
+                {{ "{:,}".format(
+                    stats.tape_capacity_bytes
+                ) }}
+                bytes
+            </div>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Free Capacity
+            </span>
+
+            <strong>
+                {{ "%.2f"|format(
+                    stats.tape_free_bytes
+                    / 1000000000000
+                ) }}
+                TB
+            </strong>
+
+            <div class="muted">
+                {{ "{:,}".format(
+                    stats.tape_free_bytes
+                ) }}
+                bytes
+            </div>
+        </div>
+
+    </div>
+
+    <div class="usage-bar-wrap">
+
+        <div class="usage-bar">
+            <div
+                class="usage-fill"
+                style="width: {{ stats.utilization_percent }}%;"
+            ></div>
+        </div>
+
+        <div class="muted">
+            {{ "%.2f"|format(
+                stats.utilization_percent
+            ) }}%
+            of cataloged tape capacity used
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <div class="table-header">
+        <h2>Tape Generations</h2>
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Generation</th>
+                    <th>Tapes</th>
+                    <th>Used</th>
+                    <th>Capacity</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for row in stats.generations %}
+
+                <tr>
+
+                    <td>
+                        {% if row.generation|string == "6" %}
+                            LTO-6
+                        {% elif row.generation|string == "5" %}
+                            LTO-5
+                        {% else %}
+                            {{ row.generation }}
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ row.tape_count }}
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(
+                            row.used_bytes
+                            / 1000000000000
+                        ) }}
+                        TB
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(
+                            row.capacity_bytes
+                            / 1000000000000
+                        ) }}
+                        TB
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <div class="table-header">
+        <h2>Tape Status</h2>
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Tapes</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for row in stats.statuses %}
+
+                <tr>
+
+                    <td>
+                        {{ row.status }}
+                    </td>
+
+                    <td>
+                        {{ row.tape_count }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

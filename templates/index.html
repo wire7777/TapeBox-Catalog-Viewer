@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>TapeBox Catalog Viewer</h1>
+        <p>
+            Read-only mirror of the TapeBox LTFS catalog
+        </p>
+    </div>
+</div>
+
+<section class="dashboard-grid">
+
+    <a
+        class="dashboard-card"
+        href="/files"
+    >
+        <h2>Files</h2>
+
+        <div class="dashboard-number">
+            {{ sync_status.file_count or 0 }}
+        </div>
+
+        <p>
+            Browse and search archived files.
+        </p>
+    </a>
+
+    <a
+        class="dashboard-card"
+        href="/tapes"
+    >
+        <h2>Tapes</h2>
+
+        <div class="dashboard-number">
+            {{ sync_status.tape_count or 0 }}
+        </div>
+
+        <p>
+            View LTFS cartridges and catalog usage.
+        </p>
+    </a>
+
+</section>
+
+<section class="card">
+
+    <div class="table-header">
+        <h2>Catalog Mirror</h2>
+
+        {% if sync_status.success == true %}
+            <span class="status good">
+                Healthy
+            </span>
+        {% elif sync_status.success == false %}
+            <span class="status warning">
+                Sync Failed
+            </span>
+        {% else %}
+            <span class="status warning">
+                Not Synced
+            </span>
+        {% endif %}
+    </div>
+
+    {% if catalog_exists %}
+
+        <p>
+            <strong>Last successful sync:</strong>
+            {{ sync_status.last_success or "Never" }}
+        </p>
+
+        <p>
+            <strong>Catalog size:</strong>
+
+            {% if sync_status.catalog_size_bytes %}
+                {{ "{:,}".format(
+                    sync_status.catalog_size_bytes
+                ) }}
+                bytes
+            {% else %}
+                —
+            {% endif %}
+        </p>
+
+        {% if sync_status.success == false %}
+
+            <div class="status warning">
+                Last sync attempt failed.
+                The previous good catalog mirror is still available.
+            </div>
+
+            <p class="muted">
+                {{ sync_status.error }}
+            </p>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="status warning">
+            No catalog has been synchronized yet.
+        </div>
+
+    {% endif %}
+
+    <form
+        method="post"
+        action="/sync"
+    >
+        <button type="submit">
+            Sync Now
+        </button>
+    </form>
+
+</section>
+
+<section class="card">
+
+    <h2>Read-Only Safety</h2>
+
+    <p>
+        This viewer only reads a local mirror of the TapeBox catalog.
+    </p>
+
+    <p>
+        It has no tape drive, LTFS mount, archive, restore,
+        format, eject, or tape deletion access.
+    </p>
+
+</section>
+
+{% endblock %}

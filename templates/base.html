@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>
+        {% block title %}
+        TapeBox Catalog Viewer
+        {% endblock %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        TapeBox Catalog Viewer
+    </div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/files">Files</a>
+        <a href="/tapes">Tapes</a>
+        <a href="/stats">Stats</a>
+        <a href="/settings">Settings</a>
+    </nav>
+</header>
+
+<main class="container">
+    {% block content %}
+    {% endblock %}
+</main>
+
+</body>
+</html>

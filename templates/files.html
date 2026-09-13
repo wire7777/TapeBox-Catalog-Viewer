@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}
+Files · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Files</h1>
+        <p>
+            Search the mirrored TapeBox archive catalog
+        </p>
+    </div>
+</div>
+
+<section class="card">
+
+    <form
+        method="get"
+        action="/files"
+        class="search-form"
+    >
+        <input
+            type="search"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search filename, path, or tape path"
+        >
+
+        <button type="submit">
+            Search
+        </button>
+
+        {% if query %}
+            <a
+                class="button-link"
+                href="/files"
+            >
+                Clear
+            </a>
+        {% endif %}
+    </form>
+
+</section>
+
+{% if error %}
+
+<section class="card">
+    <div class="status warning">
+        {{ error }}
+    </div>
+</section>
+
+{% else %}
+
+<section class="card">
+
+    <div class="table-header">
+        <h2>
+            {% if query %}
+                Search Results
+            {% else %}
+                Catalog Files
+            {% endif %}
+        </h2>
+
+        <div class="muted">
+            {{ files|length }} files
+        </div>
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Path</th>
+                    <th>Size</th>
+                    <th>Tape</th>
+                    <th>Archived</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for file in files %}
+
+                <tr>
+                    <td>
+                        <strong>
+                            <a
+                                href="/files/{{ file.id }}"
+                                class="file-link"
+                            >
+                                {{ file.filename }}
+                            </a>
+                        </strong>
+
+                        {% if file.is_spanned %}
+                            <div class="badge">
+                                Spanned
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <td class="path-cell">
+                        {{ file.relative_path }}
+                    </td>
+
+                    <td>
+                        {{ "{:,}".format(file.size_bytes or 0) }}
+                        bytes
+                    </td>
+
+                    <td>
+                        {% if file.is_spanned %}
+
+                            {% set parts =
+                                parts_by_file.get(
+                                    file.id,
+                                    []
+                                )
+                            %}
+
+                            {% for part in parts %}
+                                <div class="part-row">
+                                    Part
+                                    {{ part.part_number }}:
+                                    <strong>
+                                        {{ part.tape_label or "Unknown" }}
+                                    </strong>
+                                </div>
+                            {% endfor %}
+
+                            {% if not parts %}
+                                <span class="muted">
+                                    Spanned parts unavailable
+                                </span>
+                            {% endif %}
+
+                        {% else %}
+
+                            {{ file.tape_label or "Unknown" }}
+
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ file.archived_at or "—" }}
+                    </td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td
+                        colspan="5"
+                        class="empty-cell"
+                    >
+                        No files found.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

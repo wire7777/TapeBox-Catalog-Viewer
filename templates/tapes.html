@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}
+Tapes · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Tapes</h1>
+        <p>
+            Read-only LTFS cartridge catalog
+        </p>
+    </div>
+</div>
+
+{% if error %}
+
+<section class="card">
+    <div class="status warning">
+        {{ error }}
+    </div>
+</section>
+
+{% else %}
+
+<section class="card">
+
+    <div class="table-header">
+        <h2>Catalog Tapes</h2>
+
+        <div class="muted">
+            {{ tapes|length }} tapes
+        </div>
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Label</th>
+                    <th>Barcode</th>
+                    <th>Generation</th>
+                    <th>Used</th>
+                    <th>Capacity</th>
+                    <th>Files</th>
+                    <th>Spanned Parts</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for tape in tapes %}
+
+                <tr>
+                    <td>
+                        <strong>
+                            <a
+                                href="/tapes/{{ tape.id }}"
+                                class="tape-link"
+                            >
+                                {{ tape.label or "—" }}
+                            </a>
+                        </strong>
+
+                        {% if tape.ltfs_uuid %}
+                            <div class="muted small-text">
+                                {{ tape.ltfs_uuid }}
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ tape.barcode or "—" }}
+                    </td>
+
+                    <td>
+                        {{ tape.generation or "—" }}
+                    </td>
+
+                    <td>
+                        {% if tape.used_bytes is not none %}
+                            {{ "{:,}".format(tape.used_bytes) }}
+                            bytes
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if tape.capacity_bytes is not none %}
+                            {{ "{:,}".format(tape.capacity_bytes) }}
+                            bytes
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ tape.file_count or 0 }}
+                    </td>
+
+                    <td>
+                        {{ tape.part_count or 0 }}
+                    </td>
+
+                    <td>
+                        {{ tape.status or "—" }}
+                    </td>
+                </tr>
+
+            {% else %}
+
+                <tr>
+                    <td
+                        colspan="8"
+                        class="empty-cell"
+                    >
+                        No tapes found.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

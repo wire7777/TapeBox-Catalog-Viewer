@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}
+Settings · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Settings</h1>
+        <p>
+            Configure the TapeBox server used for catalog sync
+        </p>
+    </div>
+</div>
+
+{% if saved %}
+
+<section class="card">
+    <div class="status good">
+        Settings saved.
+    </div>
+</section>
+
+{% endif %}
+
+{% if error %}
+
+<section class="card">
+    <div class="status warning">
+        {{ error }}
+    </div>
+</section>
+
+{% endif %}
+
+<section class="card">
+
+    <h2>TapeBox Server</h2>
+
+    <form
+        method="post"
+        action="/settings"
+        class="settings-form"
+    >
+
+        <div class="form-field">
+
+            <label for="scheme">
+                Protocol
+            </label>
+
+            <select
+                id="scheme"
+                name="scheme"
+            >
+                <option
+                    value="http"
+                    {% if settings.scheme == "http" %}
+                    selected
+                    {% endif %}
+                >
+                    HTTP
+                </option>
+
+                <option
+                    value="https"
+                    {% if settings.scheme == "https" %}
+                    selected
+                    {% endif %}
+                >
+                    HTTPS
+                </option>
+            </select>
+
+        </div>
+
+        <div class="form-field">
+
+            <label for="host">
+                Server IP or Hostname
+            </label>
+
+            <input
+                id="host"
+                name="host"
+                type="text"
+                value="{{ settings.host }}"
+                placeholder="192.168.2.160"
+                required
+            >
+
+        </div>
+
+        <div class="form-field">
+
+            <label for="port">
+                Port
+            </label>
+
+            <input
+                id="port"
+                name="port"
+                type="number"
+                min="1"
+                max="65535"
+                value="{{ settings.port }}"
+                required
+            >
+
+        </div>
+
+        <div class="form-field">
+
+            <label for="catalog_mirror_api_key">
+                Catalog Mirror API Key
+            </label>
+
+            <input
+                id="catalog_mirror_api_key"
+                name="catalog_mirror_api_key"
+                type="password"
+                value=""
+                placeholder="Leave blank to keep current key"
+                autocomplete="new-password"
+            >
+
+            <p class="muted">
+                {% if api_key_configured %}
+                API key is configured.
+                Enter a new value only to replace it.
+                {% else %}
+                No API key is currently configured.
+                {% endif %}
+            </p>
+
+        </div>
+
+        <button type="submit">
+            Save Settings
+        </button>
+
+    </form>
+
+</section>
+
+<section class="card">
+
+    <h2>Catalog Source</h2>
+
+    <p class="mono detail-value">
+        {{ catalog_url }}
+    </p>
+
+    <p class="muted">
+        The viewer pulls a read-only SQLite snapshot
+        from this TapeBox server.
+    </p>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+services:
+
+  catalog-viewer:
+
+    build:
+      context: .
+
+    container_name: tapebox-catalog-viewer
+
+    ports:
+      - "8081:8081"
+
+    environment:
+      TAPEBOX_CATALOG_URL: "http://192.168.2.160:8080/api/catalog-mirror/download"
+
+    volumes:
+      - ./data:/app/data
+
+    restart: unless-stopped
+
+
+  catalog-sync:
+
+    build:
+      context: .
+
+    container_name: tapebox-catalog-sync
+
+    command:
+      - python
+      - -u
+      - -m
+      - viewer.auto_sync
+
+    environment:
+      TAPEBOX_CATALOG_URL: "http://192.168.2.160:8080/api/catalog-mirror/download"
+      TAPEBOX_SYNC_INTERVAL_SECONDS: "300"
+
+    volumes:
+      - ./data:/app/data
+
+    restart: unless-stopped

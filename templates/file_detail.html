@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ file.filename if file else "File" }} · TapeBox Catalog Viewer
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>
+            {% if file %}
+                {{ file.filename }}
+            {% else %}
+                File
+            {% endif %}
+        </h1>
+
+        <p>
+            Read-only archived file details
+        </p>
+    </div>
+
+    <div>
+        <a
+            class="button-link"
+            href="/files"
+        >
+            Back to Files
+        </a>
+    </div>
+</div>
+
+{% if error %}
+
+<section class="card">
+    <div class="status warning">
+        {{ error }}
+    </div>
+</section>
+
+{% elif file %}
+
+<section class="card">
+
+    <h2>File Details</h2>
+
+    <div class="detail-grid">
+
+        <div>
+            <span class="detail-label">
+                Filename
+            </span>
+            <strong>
+                {{ file.filename }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Size
+            </span>
+            <strong>
+                {{ "{:,}".format(
+                    file.size_bytes or 0
+                ) }}
+                bytes
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Spanned
+            </span>
+            <strong>
+                {% if file.is_spanned %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Primary Tape
+            </span>
+
+            {% if file.tape_id %}
+                <strong>
+                    <a
+                        href="/tapes/{{ file.tape_id }}"
+                        class="tape-link"
+                    >
+                        {{ file.tape_label or "Unknown" }}
+                    </a>
+                </strong>
+            {% else %}
+                <strong>—</strong>
+            {% endif %}
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Archived
+            </span>
+            <strong>
+                {{ file.archived_at or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Original Created
+            </span>
+            <strong>
+                {{ file.original_created_at or "—" }}
+            </strong>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Original Modified
+            </span>
+            <strong>
+                {{ file.original_modified_at or "—" }}
+            </strong>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <h2>Paths</h2>
+
+    <div class="detail-stack">
+
+        <div>
+            <span class="detail-label">
+                Relative Path
+            </span>
+
+            <div class="mono detail-value">
+                {{ file.relative_path or "—" }}
+            </div>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Original Path
+            </span>
+
+            <div class="mono detail-value">
+                {{ file.original_path or "—" }}
+            </div>
+        </div>
+
+        <div>
+            <span class="detail-label">
+                Tape Path
+            </span>
+
+            <div class="mono detail-value">
+                {{ file.tape_path or "—" }}
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <h2>Checksum</h2>
+
+    <div class="mono checksum">
+        {{ file.checksum_sha256 or "—" }}
+    </div>
+
+</section>
+
+{% if file.is_spanned %}
+
+<section class="card">
+
+    <div class="table-header">
+
+        <h2>Spanned Parts</h2>
+
+        <div class="muted">
+            {{ file.parts|length }} parts
+        </div>
+
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Part</th>
+                    <th>Tape</th>
+                    <th>Size</th>
+                    <th>Tape Path</th>
+                    <th>Checksum</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for part in file.parts %}
+
+                <tr>
+
+                    <td>
+                        {{ part.part_number }}
+                    </td>
+
+                    <td>
+                        <a
+                            href="/tapes/{{ part.tape_id }}"
+                            class="tape-link"
+                        >
+                            {{ part.tape_label or "Unknown" }}
+                        </a>
+                    </td>
+
+                    <td>
+                        {{ "{:,}".format(
+                            part.size_bytes or 0
+                        ) }}
+                        bytes
+                    </td>
+
+                    <td class="path-cell">
+                        {{ part.tape_path }}
+                    </td>
+
+                    <td class="mono checksum-small">
+                        {{ part.checksum_sha256 or "—" }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endif %}
+
+{% endblock %}
